@@ -8,16 +8,55 @@ client.on('ready', () => {
 });
 
 client.on('message', message => {
-    if (!message.content.startsWith(prefix) || message.author.bot) return;
-
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
-    const validCommands = ['imposteur', 'lobby', 'gameover'];
+    const validCommands = ['imposteur', 'lobby', 'gameover', 'purge'];
     const crewmateEmoji = message.guild.emojis.cache.get('764152978957271060');
-    
+
+    if (!message.content.startsWith(prefix) || message.author.bot) return;
 
     if (command === 'imposteur') {
         return message.channel.send('Votez **<@257244637650092032>** \nIl est louche...');
+    }
+
+    //Purge messages from channel, only for admins & mods
+    else if (command === 'purge')
+    {
+        if (message.member.hasPermission("MANAGE_MESSAGES")) {
+
+            const amount = parseInt(args[0]);
+
+           if(!args.length)
+           {
+               return message.channel.send(`${message.author} cette commande a besoin d'options pour fonctionner !`);
+           }
+           
+           if (isNaN(amount)) {
+                return message.channel.send(`${message.author} l'option de cette fonction doit être un nombre.`);
+           } else if (amount <= 1 || amount > 100) {
+                return message.channel.send(`${message.author} l'option de cette fonction doit être un nombre entre 1 & 100.`);
+           }
+
+           message.channel.bulkDelete(amount, true).catch((err) => {
+            console.error(err);
+            message.channel.send(
+                "Une erreur a empêché la suppresion des messages."
+           );
+        })}
+        else {return message.channel.send(`${message.author}, Vous n'avez pas les droits pour cette commande.`)};
+    }
+
+    else if (command === 'gameover')
+    {
+        // TODO Add function that deletes bot messages in #annonces-games channel
+
+        message.guild.members.cache.forEach(member => {
+            if(!member.roles.cache.find(t => t.id == '764968869973458947')) return;
+            member.roles.remove('764968869973458947')
+                .then(function() {
+                console.log(`Removed role from user ${member.user.tag}!`);
+            });
+        });
     }
 
     else if (command === 'lobby') {
