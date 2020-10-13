@@ -4,7 +4,9 @@ const {prefix, token} = require('./auth.json');
 
 //Initialize bot
 client.on('ready', () => {
+    const logsChan = client.channels.cache.get('764572804444061697');
     console.log(`Logged in as ${client.user.tag}!`);
+    logsChan.send(`Bot connecté en tant que ${client.user.tag}`);
 });
 
 client.on('message', message => {
@@ -12,6 +14,7 @@ client.on('message', message => {
     const command = args.shift().toLowerCase();
     const validCommands = ['imposteur', 'lobby', 'gameover', 'purge'];
     const crewmateEmoji = message.guild.emojis.cache.get('764152978957271060');
+    const logsChannel = message.guild.channels.cache.get('764572804444061697');
 
     if (!message.content.startsWith(prefix) || message.author.bot) return;
 
@@ -42,12 +45,15 @@ client.on('message', message => {
             message.channel.send(
                 "Une erreur a empêché la suppresion des messages."
            );
-        })}
+        },
+        logsChannel.send(`Clear effectué, ${amount} message(s) supprimés`)
+        )}
         else {return message.channel.send(`${message.author}, Vous n'avez pas les droits pour cette commande.`)};
     }
 
     else if (command === 'gameover')
     {
+        
         // TODO Add function that deletes bot messages in #annonces-games channel
 
         message.guild.members.cache.forEach(member => {
@@ -55,6 +61,7 @@ client.on('message', message => {
             member.roles.remove('764968869973458947')
                 .then(function() {
                 console.log(`Removed role from user ${member.user.tag}!`);
+                logsChannel.send(`Removed role from user ${member.user.tag}!`);
             });
         });
     }
@@ -70,6 +77,7 @@ client.on('message', message => {
         }
         
         commandUser.roles.add(crewmateRole);
+        logsChannel.send(`${message.author} a ouvert un lobby`);
 
         message.channel.send(`||@everyone||\n\n📢  ${message.author} organise une game **Among Us** aujourd'hui à **${args[0]}h** !
         \n\n ➡️  Pour participer : Merci de **réagir à ce message avec l'émote :  <:crewmate:764152978957271060>  (sans quoi votre participation ne comptera pas) !!!**
@@ -95,12 +103,14 @@ client.on('messageReactionAdd', (reaction, user) => {
     const message = reaction.message;
     const crewmateRole = message.guild.roles.cache.get('764968869973458947');
     const msgUser = message.guild.members.cache.get(user.id);
+    const logsChannel = message.guild.channels.cache.get('764572804444061697');
 
     //add crewmate role on desired reaction
     if(reaction.emoji.name === 'crewmate' && !user.bot)
     {
         msgUser.roles.add(crewmateRole);
         console.log(`${msgUser} a rejoint le role ${crewmateRole.name}`);
+        logsChannel.send(`${msgUser} a rejoint le role ${crewmateRole.name}`);
         message.edit(message.content + `\n* ${msgUser}`);
     }
 });
@@ -110,12 +120,14 @@ client.on('messageReactionRemove', (reaction, user) => {
     const message = reaction.message;
     const crewmateRole = message.guild.roles.cache.get('764968869973458947');
     const msgUser = message.guild.members.cache.get(user.id);
+    const logsChannel = message.guild.channels.cache.get('764572804444061697');
 
     //remove crewmate role on desired reaction
     if(reaction.emoji.name === 'crewmate' && !user.bot)
     {
         msgUser.roles.remove(crewmateRole);
         console.log(`${msgUser} a quitté le role ${crewmateRole.name}`);
+        logsChannel.send(`${msgUser} a quitté le role ${crewmateRole.name}`);
         message.edit(message.content.replace(`\n* ${msgUser}`, ''));
     }
 });
