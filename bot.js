@@ -9,11 +9,11 @@ client.on('ready', () => {
     logsChan.send(`Bot connecté en tant que ${client.user.tag}`);
 });
 
-client.on('message', message => {
+client.on('message', async message => {
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
     const validCommands = ['imposteur', 'lobby', 'gameover', 'purge', 'help', 'i'];
-    const logsChannel = message.guild.channels.cache.get('764572804444061697');
+    const logsChannel = client.channels.cache.get('764572804444061697');
 
     if (!message.content.startsWith(prefix) || message.author.bot) return;
 
@@ -86,17 +86,16 @@ client.on('message', message => {
         {
             // TODO Add function that deletes bot messages in #annonces-games channel
 
-        message.guild.members.cache.forEach(member => {
-            if(!member.roles.cache.find(t => t.id == '764968869973458947')) return;
-            member.roles.remove('764968869973458947')
-                .then(function() {
-                console.log(`Removed role from user ${member.user.tag}!`);
-                logsChannel.send(`Removed role from user ${member.user.tag}!`);
+            message.guild.members.cache.forEach(member => {
+                if(!member.roles.cache.find(t => t.id == '764968869973458947')) return;
+                member.roles.remove('764968869973458947')
+                    .then(function() {
+                    console.log(`Removed role from user ${member.user.tag}!`);
+                    logsChannel.send(`Removed role from user ${member.user.tag}!`);
+                });
             });
-        });
         }
         else {return message.channel.send(`${message.author}, Vous n'avez pas les droits pour cette commande.`)};
-        
     }
 
     else if (command === 'lobby') {
@@ -129,7 +128,7 @@ client.on('message', message => {
     }
     
     else if(command != validCommands || !command) {
-        return message.channel.send(`${message.author}, commande invalide ou inexsitante ! \n Tapez !help pour une assistance.`);
+        return message.channel.send(`${message.author}, commande invalide ou inexistante ! \n Tapez !help pour une assistance.`);
     };
 });
 
@@ -142,7 +141,7 @@ client.on('messageReactionAdd', (reaction, user) => {
     const gameChannel = message.guild.channels.cache.get('763376836025122837');
 
     //add crewmate role on desired reaction
-    if(reaction.emoji.name === 'crewmate' && !user.bot && message.channel.id === gameChannel.id)
+    if(reaction.emoji.name === 'crewmate' && !user.bot && message.channel.id === gameChannel.id && message.author.bot)
     {
         msgUser.roles.add(crewmateRole);
         console.log(`${msgUser} a rejoint le role ${crewmateRole.name}`);
@@ -160,7 +159,7 @@ client.on('messageReactionRemove', (reaction, user) => {
     const gameChannel = message.guild.channels.cache.get('763376836025122837');
 
     //remove crewmate role on desired reaction
-    if(reaction.emoji.name === 'crewmate' && !user.bot && message.channel.id === gameChannel.id)
+    if(reaction.emoji.name === 'crewmate' && !user.bot && message.channel.id === gameChannel.id && message.author.bot)
     {
         msgUser.roles.remove(crewmateRole);
         console.log(`${msgUser} a quitté le role ${crewmateRole.name}`);
