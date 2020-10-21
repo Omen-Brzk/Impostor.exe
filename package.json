@@ -1,6 +1,6 @@
 {
     "name": "impostor.exe",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "description": "custom bot to create among us games with friends",
     "main": "bot.js",
     "author": "RN",

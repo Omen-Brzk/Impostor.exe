@@ -21,12 +21,14 @@ client.on('message', async message => {
         return message.channel.send('Votez **<@257244637650092032>** \nIl est louche...');
     }
 
+    //Discord invite command
     else if (command === 'i')
     {
         message.channel.send(`${message.author}, https://discord.gg/SKKsRNu`);
         return;
     }
 
+    //help command
     else if (command === 'help' || command === 'h') {
         const helpEmbed = new Discord.MessageEmbed()
         .setColor('#0099ff')
@@ -43,7 +45,7 @@ client.on('message', async message => {
             { name: '**!lobby (option)**', value: 'Crée un message dans <#763376836025122837> cliquable pour organiser et rejoindre un lobby.'},
             { name: '\u200B', value: '\u200B' }
         )
-        .addField('⚠️Précisions pour la commande !lobby ⚠️\n\n', 'Concernant la commande **!lobby** elle attend une (option) pour fonctionner à savoir un horaire \n\nPar exemple : !lobby 22 créera un **lobby programmé pour 22h !**\n\nChaque personne voulant rejoindre votre lobby devra **réagir au message dans <#763376836025122837> avec l\'emote <:crewmate:764152978957271060>** pour obtenir le rôle **<@&764968869973458947>**. \n\nLes <@&764968869973458947> ont accès aux channels vocaux Lobby 1 & 2 ainsi qu\'au channel <#765225922059042856>, **sans ce rôle vous ne pourrez rejoindre le lobby !⚠️**', true)
+        .addField('⚠️Précisions pour la commande !lobby ⚠️\n\n', 'Concernant la commande **!lobby** elle attend une (option) pour fonctionner à savoir un horaire \n\nPar exemple : !lobby 22 créera un **lobby programmé pour 22h00 !**\n\n!lobby 22 30 créera un **lobby programmé pour 22h30 !**\n\nChaque personne voulant rejoindre votre lobby devra **réagir au message dans <#763376836025122837> avec l\'emote <:crewmate:764152978957271060>** pour obtenir le rôle **<@&764968869973458947>**. \n\nLes <@&764968869973458947> ont accès aux channels vocaux Lobby 1 & 2 ainsi qu\'au channel <#765225922059042856>, **sans ce rôle vous ne pourrez rejoindre le lobby !⚠️**', true)
         .addField('\u200B', '\u200B')
         .setFooter('Plusieurs commandes seront ajoutées/modifées dans le futur, si vous avez besoin d\'aide mp moi !')
         .setTimestamp();
@@ -84,16 +86,38 @@ client.on('message', async message => {
     {
         if(message.member.hasPermission('MANAGE_MESSAGES'))
         {
-            // TODO Add function that deletes bot messages in #annonces-games channel
-
-            message.guild.members.cache.forEach(member => {
-                if(!member.roles.cache.find(t => t.id == '764968869973458947')) return;
-                member.roles.remove('764968869973458947')
-                    .then(function() {
-                    console.log(`Removed role from user ${member.user.tag}!`);
-                    logsChannel.send(`Removed role from user ${member.user.tag}!`);
-                });
-            });
+            if(args.length)
+            {
+                if(args[0].length < 24) {
+                    return message.channel.send(`${message.author}, id de partie invalide ou inexistant.`);
+                }
+    
+                else if(args[0].length === 24)
+                {
+                    const check = args;
+                    let gameChan = message.guild.channels.cache.get('763376836025122837');
+                    
+                    gameChan.messages.fetch().then(msg => {
+                        let msgDel = msg.filter(msg => msg.content.includes(check));
+                        console.log(msgDel);
+                        if(!msgDel.find(m => m.id)) {
+                            return message.channel.send(`${message.author}, id de partie invalide ou inexistant.`);
+                        }
+                        gameChan.bulkDelete(msgDel);
+                        logsChannel.send(`Partie ||#**${args[0]}**|| supprimée par ${message.author}`);
+                        message.guild.members.cache.forEach(member => {
+                            if(!member.roles.cache.find(t => t.id == '764968869973458947')) return;
+                            member.roles.remove('764968869973458947')
+                                .then(function() {
+                                console.log(`Removed role from user ${member.user.tag}!`);
+                                logsChannel.send(`Removed role from user ${member.user.tag}!`);
+                            });
+                        });
+                    });
+                    console.log(args[0]);
+                }
+            }
+            else {return message.channel.send(`${message.author}, commande invalide`)};   
         }
         else {return message.channel.send(`${message.author}, Vous n'avez pas les droits pour cette commande.`)};
     }
@@ -105,26 +129,30 @@ client.on('message', async message => {
         const crewChannel = message.guild.channels.cache.get('765225922059042856');
         const crewmateEmoji = message.guild.emojis.cache.get('764152978957271060');
         const gameChannel = message.guild.channels.cache.get('763376836025122837');
+        const h = genHash();
 
         if (!args.length) {
             return message.channel.send(`${message.author} cette commande a besoin d'options pour fonctionner !`);
         }
         
         commandUser.roles.add(crewmateRole);
-        logsChannel.send(`${message.author} a ouvert un lobby`);
+        logsChannel.send(`${message.author} a ouvert un lobby,\n||(**id: ${h}**)||`);
 
-        gameChannel.send(`||@everyone||\n\n📢  ${message.author} organise une game **Among Us** aujourd'hui à **${args[0]}h** !
+        gameChannel.send(`||@everyone||\n\n📢  ${message.author} organise une game **Among Us** aujourd'hui à **${args[0]}h${args.length > 1 ? `${args[1]}` : '00'}** !
         \n\n ➡️  Pour participer : Merci de **réagir à ce message avec l'émote :  <:crewmate:764152978957271060>  (sans quoi votre participation ne comptera pas) !!!**
         \n\n 🔷 Réagir avec cette emote vous donnera l'accès au rôle **${crewmateRole}** ainsi qu'au channel <#${crewChannel.id}> pour préparer votre game ! 
         \n\n 🔵 Vous aurez également accès au channels vocaux **Lobby 1 & 2 !**
         \n (⚠️ **Sans ce rôle vous ne pourrez pas vous connecter en vocal !** ⚠️)
         \n\n ⭕ *Pour vous **désinscrire** enlevez simplement votre réaction en bas de ce message en cliquant à nouveau sur celle-ci*
+        \n\n ||id: ${h}||
         \n\n **Participants :**
         \n* ${message.author}
         `)
         .then(async msg => {
             await msg.react(crewmateEmoji);
         })
+        console.log(args);
+        console.log(h);
     }
     
     else if(command != validCommands || !command) {
@@ -174,6 +202,20 @@ client.on('guildMemberAdd', (member) => {
     .send('**<@' + member.id + '>** est sorti d\'une vent !! \nVotez le prochain buzz !');
 });
 
+//Log message on guildMemberRemove event
+client.on('guildMemberRemove', (member) =>{
+    client.channels.cache.get('764572804444061697').send(`**${member}** a quitté le serveur.`);
+})
+
+function genHash() {
+    const chars = 'abcdefghijklmnopqrstuvwxyz';
+    let h = "";
+    let n = 24;
+    for(let i = 0; i < n; i++) {
+        h += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return h;
+};
 
 //Bot login, code must be above this line.
 client.login(token);
