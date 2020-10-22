@@ -189,10 +189,18 @@ client.on('messageReactionRemove', (reaction, user) => {
     //remove crewmate role on desired reaction
     if(reaction.emoji.name === 'crewmate' && !user.bot && message.channel.id === gameChannel.id && message.author.bot)
     {
-        msgUser.roles.remove(crewmateRole);
-        console.log(`${msgUser} a quitté le role ${crewmateRole.name}`);
-        logsChannel.send(`${msgUser} a quitté le role ${crewmateRole.name}`);
-        message.edit(message.content.replace(`\n* ${msgUser}`, ''));
+        //Fix error when removing role on ban/kicked member
+        if(msgUser != null)
+        {
+            msgUser.roles.remove(crewmateRole);
+            console.log(`${msgUser} a quitté le role ${crewmateRole.name}`);
+            logsChannel.send(`${msgUser} a quitté le role ${crewmateRole.name}`);
+            message.edit(message.content.replace(`\n* ${msgUser}`, ''));
+        }
+        else {
+            console.log('Erreur quand à la suppresion du rôle : membre inexistant ou kick');
+            return;
+        } 
     }
 });
 
@@ -205,7 +213,7 @@ client.on('guildMemberAdd', (member) => {
 //Log message on guildMemberRemove event
 client.on('guildMemberRemove', (member) =>{
     client.channels.cache.get('764572804444061697').send(`**${member}** a quitté le serveur.`);
-})
+});
 
 function genHash() {
     const chars = 'abcdefghijklmnopqrstuvwxyz';
