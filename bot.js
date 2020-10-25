@@ -82,6 +82,7 @@ client.on('message', async message => {
         else {return message.channel.send(`${message.author}, Vous n'avez pas les droits pour cette commande.`)};
     }
 
+    // Clean command for all crewmates members & lobby's message after a game
     else if (command === 'gameover')
     {
         if(message.member.hasPermission('MANAGE_MESSAGES'))
@@ -95,7 +96,7 @@ client.on('message', async message => {
                 else if(args[0].length === 24)
                 {
                     const check = args;
-                    let gameChan = message.guild.channels.cache.get('763376836025122837');
+                    const gameChan = message.guild.channels.cache.get('763376836025122837');
                     
                     gameChan.messages.fetch().then(msg => {
                         let msgDel = msg.filter(msg => msg.content.includes(check));
@@ -136,7 +137,9 @@ client.on('message', async message => {
         }
         
         commandUser.roles.add(crewmateRole);
-        logsChannel.send(`${message.author} a ouvert un lobby,\n||(**id: ${h}**)||`);
+        logsChannel.send(`${message.author} a ouvert un lobby,\n||(#**${h}**)||`);
+
+        //Add voice & text private channels based on h const
 
         gameChannel.send(`||@everyone||\n\n📢  ${message.author} organise une game **Among Us** aujourd'hui à **${args[0]}h${args.length > 1 ? `${args[1]}` : '00'}** !
         \n\n ➡️  Pour participer : Merci de **réagir à ce message avec l'émote :  <:crewmate:764152978957271060>  (sans quoi votre participation ne comptera pas) !!!**
@@ -144,7 +147,7 @@ client.on('message', async message => {
         \n\n 🔵 Vous aurez également accès au channels vocaux **Lobby 1 & 2 !**
         \n (⚠️ **Sans ce rôle vous ne pourrez pas vous connecter en vocal !** ⚠️)
         \n\n ⭕ *Pour vous **désinscrire** enlevez simplement votre réaction en bas de ce message en cliquant à nouveau sur celle-ci*
-        \n\n ||id: ${h}||
+        \n\n ||# **${h}**||
         \n\n **Participants :**
         \n* ${message.author}
         `)
