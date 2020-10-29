@@ -1,8 +1,3 @@
-/**TODO
- * Rework bot !lobby function (ez & medium game difficulty)
- * Rework bot !gameover {id} function
- */
-
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const {prefix, token} = require('./auth.json');
@@ -17,7 +12,7 @@ client.on('ready', () => {
 client.on('message', async message => {
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
-    const validCommands = ['imposteur', 'lobby', 'gameover', 'purge', 'help', 'i', 'roles'];
+    const validCommands = ['imposteur', 'lobby', 'gameover', 'purge', 'help', 'i'];
     const logsChannel = client.channels.cache.get('764572804444061697');
 
     if (!message.content.startsWith(prefix) || message.author.bot) return;
@@ -31,22 +26,6 @@ client.on('message', async message => {
     {
         message.channel.send(`${message.author}, https://discord.gg/SKKsRNu`);
         return;
-    }
-
-    //Roles interactive menu message command
-    else if (command === 'roles')
-    {
-        const pickupRole = message.guild.roles.cache.get('771218847716999219');
-
-        client.channels.cache.get('763436756736933928').send(`**Menu d'attribution des rôles**
-        \n\n :arrow_right: Pour obtenir le rôle souhaité, vous devez réagir avec l\'emote correspondante :
-        \n - 🅿️ => Vous octroie le rôle ${pickupRole} : Disponible pour des games ? Vous cherchez des mates mais le lobby est complet ?
-        \n **Le rôle ${pickupRole} est fait pour vous !** : Une fois une place libre, on vous mentionnera pour venir jouer, pas belle la vie ? 🔥
-        \n\n ||Pour vous retirer ce rôle, retirez votre réaction à ce message 😉!||
-        `)
-        .then(async msg => {
-            await msg.react('🅿️');
-        });
     }
 
     //help command
@@ -174,7 +153,7 @@ client.on('message', async message => {
         `)
         .then(async msg => {
             await msg.react(crewmateEmoji);
-        });
+        })
         console.log(args);
         console.log(h);
     }
@@ -191,7 +170,6 @@ client.on('messageReactionAdd', (reaction, user) => {
     const msgUser = message.guild.members.cache.get(user.id);
     const logsChannel = message.guild.channels.cache.get('764572804444061697');
     const gameChannel = message.guild.channels.cache.get('763376836025122837');
-    const pickupRole = message.guild.roles.cache.get('771218847716999219');
 
     //add crewmate role on desired reaction
     if(reaction.emoji.name === 'crewmate' && !user.bot && message.channel.id === gameChannel.id && message.author.bot)
@@ -200,14 +178,6 @@ client.on('messageReactionAdd', (reaction, user) => {
         console.log(`${msgUser} a rejoint le role ${crewmateRole.name}`);
         logsChannel.send(`${msgUser} a rejoint le role ${crewmateRole.name}`);
         message.edit(message.content + `\n* ${msgUser}`);
-    }
-
-    //add pickup role on desired reaction
-    else if(reaction.emoji.name === '🅿️' && !user.bot && message.channel.id === '763436756736933928' && message.author.bot)
-    {
-        msgUser.roles.add(pickupRole);
-        console.log(`${msgUser} a rejoint le role ${pickupRole}`);
-        logsChannel.send(`${msgUser} a rejoint le role ${pickupRole}`);
     }
 });
 
@@ -218,7 +188,6 @@ client.on('messageReactionRemove', (reaction, user) => {
     const msgUser = message.guild.members.cache.get(user.id);
     const logsChannel = message.guild.channels.cache.get('764572804444061697');
     const gameChannel = message.guild.channels.cache.get('763376836025122837');
-    const pickupRole = message.guild.roles.cache.get('771218847716999219');
 
     //remove crewmate role on desired reaction
     if(reaction.emoji.name === 'crewmate' && !user.bot && message.channel.id === gameChannel.id && message.author.bot)
@@ -232,16 +201,9 @@ client.on('messageReactionRemove', (reaction, user) => {
             message.edit(message.content.replace(`\n* ${msgUser}`, ''));
         }
         else {
-            console.log('Erreur lors de la suppresion du rôle : membre inexistant ou kick');
+            console.log('Erreur quand à la suppresion du rôle : membre inexistant ou kick');
             return;
         } 
-    }
-    // remove pickuprole on desired reaction
-    else if(reaction.emoji.name === '🅿️' && !user.bot && message.channel.id === '763436756736933928' && message.author.bot)
-    {
-        msgUser.roles.remove(pickupRole);
-        console.log(`${msgUser} a quitté le role ${pickupRole}`);
-        logsChannel.send(`${msgUser} a quitté le role ${pickupRole}`);
     }
 });
 
@@ -256,7 +218,6 @@ client.on('guildMemberRemove', (member) =>{
     client.channels.cache.get('764572804444061697').send(`**${member}** a quitté le serveur.`);
 });
 
-//Generate #ID for each games created
 function genHash() {
     const chars = 'abcdefghijklmnopqrstuvwxyz';
     let h = "";
