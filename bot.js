@@ -1,12 +1,29 @@
 const Discord = require('discord.js');
-const client = new Discord.Client();
-const {prefix, token} = require('./auth.json');
+const { Client, Intents } = require("discord.js");
+const intents = new Intents([
+    Intents.NON_PRIVILEGED, // include all non-privileged intents, would be better to specify which ones you actually need
+    "GUILD_MEMBERS", // lets you request guild members (i.e. fixes the issue)
+]);
+const client = new Client({ ws: { intents } });
+const {prefix, token, SERVER_ID} = require('./auth.json');
+
+
 
 //Initialize bot
 client.on('ready', () => {
     const logsChan = client.channels.cache.get('764572804444061697');
+    const server = client.guilds.cache.get(SERVER_ID);
     console.log(`Logged in as ${client.user.tag}!`);
     logsChan.send(`Bot connecté en tant que ${client.user.tag}`);
+    logsChan.send(`🕖 **Début** de la mise en cache des membres sur **${server}**...`);
+
+    //Caching all members on Bot init (->bug on reactions to messages with inactives users)
+    server.members.fetch().then((members) => {
+    console.log(members.size)
+    logsChan.send(`⭕ **${members.size}** membres mis en cache.
+    \n✅ **FIN** de la mise en cache des membres sur **${server}**`)
+    .catch(console.error);
+    });
 });
 
 client.on('message', async message => {
@@ -174,10 +191,17 @@ client.on('messageReactionAdd', (reaction, user) => {
     //add crewmate role on desired reaction
     if(reaction.emoji.name === 'crewmate' && !user.bot && message.channel.id === gameChannel.id && message.author.bot)
     {
-        msgUser.roles.add(crewmateRole);
-        console.log(`${msgUser} a rejoint le role ${crewmateRole.name}`);
-        logsChannel.send(`${msgUser} a rejoint le role ${crewmateRole.name}`);
-        message.edit(message.content + `\n* ${msgUser}`);
+        if(msgUser != null) 
+        {
+            msgUser.roles.add(crewmateRole);
+            console.log(`${msgUser} a rejoint le role ${crewmateRole.name}`);
+            logsChannel.send(`${msgUser} a rejoint le role ${crewmateRole.name}`);
+            message.edit(message.content + `\n* ${msgUser}`);
+        }
+        else {
+            console.log('Erreur lors de l\'ajout du rôle : membre inexistant ou kick (cache)');
+            return;
+        }
     }
 });
 
