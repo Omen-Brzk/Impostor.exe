@@ -5,13 +5,20 @@ const intents = new Intents([
     "GUILD_MEMBERS", // lets you request guild members (i.e. fixes the issue)
 ]);
 const client = new Client({ ws: { intents } });
-const {prefix, token, SERVER_ID} = require('./auth.json');
+const {prefix, token, SERVER_ID, logsChanId} = require('./auth.json');
 
-
+const low = require('lowdb')
+const FileSync = require('lowdb/adapters/FileSync')
+const adapter = new FileSync('db.json')
+const db = low(adapter)
 
 //Initialize bot
 client.on('ready', () => {
-    const logsChan = client.channels.cache.get('764572804444061697');
+    // Set jonv and redule as pussies
+    db.set('users', [{'name':'jonv11', 'role':'pussy'},{'name':'redule26', 'role':'pussy'}])
+    .write()
+
+    const logsChan = client.channels.cache.get(logsChanId);
     const server = client.guilds.cache.get(SERVER_ID);
     console.log(`Logged in as ${client.user.tag}!`);
     logsChan.send(`Bot connecté en tant que ${client.user.tag}`);
@@ -24,22 +31,23 @@ client.on('ready', () => {
     \n✅ **FIN** de la mise en cache des membres sur **${server}**`)
     .catch(console.error);
     });
+
+    //Oniii fait l'idiot
+    const dbcontent = db.get('users');
+    console.log(dbcontent.value());
+    logsChan.send("Contenu de la DB = \n" + dbcontent.value());
 });
 
 client.on('message', async message => {
-    const args = message.content.slice(prefix.length).trim().split(/ +/);
-    const command = args.shift().toLowerCase();
-    const validCommands = ['imposteur', 'lobby', 'gameover', 'purge', 'help', 'i'];
-    const logsChannel = client.channels.cache.get('764572804444061697');
-
     if (!message.content.startsWith(prefix) || message.author.bot) return;
 
-    if (command === 'imposteur') {
-        return message.channel.send('Votez **<@257244637650092032>** \nIl est louche...');
-    }
+    const args = message.content.slice(prefix.length).trim().split(/ +/);
+    const command = args.shift().toLowerCase();
+    const validCommands = ['lobby', 'gameover', 'purge', 'help', 'i'];
+    const logsChannel = client.channels.cache.get(logsChanId);
 
     //Discord invite command
-    else if (command === 'i')
+    if (command === 'i')
     {
         message.channel.send(`${message.author}, https://discord.gg/SKKsRNu`);
         return;
@@ -157,7 +165,6 @@ client.on('message', async message => {
         logsChannel.send(`${message.author} a ouvert un lobby,\n||(#**${h}**)||`);
 
         //Add voice & text private channels based on h const
-
         gameChannel.send(`||@everyone||\n\n📢  ${message.author} organise une game **Among Us** aujourd'hui à **${args[0]}h${args.length > 1 ? `${args[1]}` : '00'}** !
         \n\n ➡️  Pour participer : Merci de **réagir à ce message avec l'émote :  <:crewmate:764152978957271060>  (sans quoi votre participation ne comptera pas) !!!**
         \n\n 🔷 Réagir avec cette emote vous donnera l'accès au rôle **${crewmateRole}** ainsi qu'au channel <#${crewChannel.id}> pour préparer votre game ! 
