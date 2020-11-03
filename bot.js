@@ -37,11 +37,11 @@ client.on('ready', () => {
     //Oniii fait l'idiot
     const dbcontent = db.get('users');
     console.log(dbcontent.value());
-    logsChan.send("Contenu de la DB = \n" + dbcontent.value());
-
+    // logsChan.send("Contenu de la DB = \n" + dbcontent.value());
+    
     var times = ['11:15', '25:00']
     for(let i = 0; i < times.length; i++){
-        var time = moment(times[i]);
+        var time = moment(times[i],['HH:mm', 'H:mm']);
         console.log('HH:mm', times[i], time);
         logsChan.send(times[i] + " = " + time._i + " isValid : " + time.isValid());
     }
