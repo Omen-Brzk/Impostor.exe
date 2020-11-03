@@ -12,6 +12,8 @@ const FileSync = require('lowdb/adapters/FileSync')
 const adapter = new FileSync('db.json')
 const db = low(adapter)
 
+const moment = require('moment');
+
 //Initialize bot
 client.on('ready', () => {
     // Set jonv and redule as pussies
@@ -21,21 +23,29 @@ client.on('ready', () => {
     const logsChan = client.channels.cache.get(logsChanId);
     const server = client.guilds.cache.get(SERVER_ID);
     console.log(`Logged in as ${client.user.tag}!`);
-    logsChan.send(`Bot connecté en tant que ${client.user.tag}`);
-    logsChan.send(`🕖 **Début** de la mise en cache des membres sur **${server}**...`);
+    // logsChan.send(`Bot connecté en tant que ${client.user.tag}`);
+    // logsChan.send(`🕖 **Début** de la mise en cache des membres sur **${server}**...`);
 
     //Caching all members on Bot init (->bug on reactions to messages with inactives users)
-    server.members.fetch().then((members) => {
-    console.log(members.size)
-    logsChan.send(`⭕ **${members.size}** membres mis en cache.
-    \n✅ **FIN** de la mise en cache des membres sur **${server}**`)
-    .catch(console.error);
-    });
+    // server.members.fetch().then((members) => {
+    // console.log(members.size)
+    // // logsChan.send(`⭕ **${members.size}** membres mis en cache.
+    // \n✅ **FIN** de la mise en cache des membres sur **${server}**`)
+    // .catch(console.error);
+    // });
 
     //Oniii fait l'idiot
     const dbcontent = db.get('users');
     console.log(dbcontent.value());
     logsChan.send("Contenu de la DB = \n" + dbcontent.value());
+
+    var times = ['11:15', '25:00']
+    for(let i = 0; i < times.length; i++){
+        var time = moment(times[i]);
+        console.log('HH:mm', times[i], time);
+        logsChan.send(times[i] + " = " + time._i + " isValid : " + time.isValid());
+    }
+    
 });
 
 client.on('message', async message => {
