@@ -12,7 +12,7 @@ const { prefix, token, serverId, logsChanId, crewmateRoleId, crewChannelId, game
 // const low = require('lowdb');
 // const FileSync = require('lowdb/adapters/FileSync');
 // const adapter = new FileSync('db.json');
-// const db = low(adapter);
+// const db = low(adapter); 
 
 // moment is used for hours
 const moment = require('moment');
@@ -57,16 +57,13 @@ client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
     console.log(server);
 
-    getMember('266293059526983691').then((member, err) => {
+    /**getMember('266293059526983691').then((member, err) => {
         console.log(member,err);
-    });
+    });**/
 
     server.members.fetch().then((members) => {
          fetchedMembers = members;
          console.log('fetched');
-         getMember('266293059526983691').then((member, err) => {
-            console.log(member,err);
-        });
     });
     
     crewmateRole = server.roles.cache.get(crewmateRoleId);
@@ -251,7 +248,7 @@ client.on('message', async message => {
 //Adding roles on messageReactionAdd Event
 client.on('messageReactionAdd', (reaction, user) => {
     const message = reaction.message;
-    const msgUser = message.guild.members.cache.get(user.id);
+    //const msgUser = message.guild.members.cache.get(user.id);
     getMember(user.id).then(member => {
         console.log(member.nickname);
         //add crewmate role on desired reaction
