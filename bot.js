@@ -34,7 +34,9 @@ const getMember = (id) => {
                 server.members.fetch().then((members) => {
                 fetchedMembers = members;
                 resolve(fetchedMembers.find(u => u.id === id));
-            })};
+            })} else {
+                resolve(fetchedMembers.find(u => u.id === id));
+            };
         } catch {
             console.log('user not found : ' + id);
             logsChannel.send('user not found : ' + id);
@@ -59,11 +61,14 @@ client.on('ready', () => {
         console.log(member,err);
     });
 
-
-    // server.members.fetch().then((members) => {
-    //      fetchedMembers = members;
-    // });
-        
+    server.members.fetch().then((members) => {
+         fetchedMembers = members;
+         console.log('fetched');
+         getMember('266293059526983691').then((member, err) => {
+            console.log(member,err);
+        });
+    });
+    
     crewmateRole = server.roles.cache.get(crewmateRoleId);
     console.log('crewmate role found :', crewmateRole)
 
