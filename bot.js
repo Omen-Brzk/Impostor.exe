@@ -20,12 +20,26 @@ const allowedTimeFormats = ['HH:mm'];
 
 const allowedLobbyTypes = ['all', 'chill', 'intermediate'];
 
+let server = undefined;
 let crewmateRole = undefined;
 let logsChannel = undefined;
 let crewChannel = undefined;
 let gameChannel = undefined;
+let fetchedMembers = [];
 
-
+const getMember = function(id) {
+    return new Promise(function(resolve, reject) {
+        const member = fetchedMembers.find(u => u.id === id);
+        if (member) {
+            resolve(member);
+        } else {
+            server.members.fetch().then((members) => {
+                fetchedMembers = members;
+                resolve(fetchedMembers.find(u => u.id === id));
+            });
+        }
+    });
+  }
 //Initialize bot
 client.on('ready', () => {
     //// test d'insertion de valeurs en DB locale
@@ -34,31 +48,36 @@ client.on('ready', () => {
     // console.log(dbcontent.value());
     // logsChan.send("Contenu de la DB = \n" + dbcontent.value());
     
-    const server = client.guilds.cache.get(serverId);
+    server = client.guilds.cache.get(serverId);
     console.log(`Logged in as ${client.user.tag}!`);
+    console.log(server);
+
+    server.members.fetch().then((members) => {
+         fetchedMembers = members;
+    });
         
     crewmateRole = server.roles.cache.get(crewmateRoleId);
     console.log('crewmate role found :', crewmateRole)
 
-    logsChannel = client.channels.cache.get(logsChanId);
+    logsChannel = server.channels.cache.get(logsChanId);
     console.log('logs channel found :', logsChannel)
 
-    crewChannel = client.channels.cache.get(crewChannelId);
+    crewChannel = server.channels.cache.get(crewChannelId);
     console.log('crew channel found :', crewChannel)
     
-    gameChannel = client.channels.cache.get(gameChannelId);
+    gameChannel = server.channels.cache.get(gameChannelId);
     console.log('game channel found :', crewmateRole);
     
-    logsChannel.send(`Bot connecté en tant que ${client.user.tag}`);
-    logsChannel.send(`🕖 **Début** de la mise en cache des membres sur **${server}**...`);
+    // logsChannel.send(`Bot connecté en tant que ${client.user.tag}`);
+    // logsChannel.send(`🕖 **Début** de la mise en cache des membres sur **${server}**...`);
     
-    // Caching all members on Bot init (->bug on reactions to messages with inactives users)
-    server.members.fetch().then((members) => {
-    console.log(members.size)
-        logsChannel.send(`⭕ **${members.size}** membres mis en cache.
-        \n✅ **FIN** de la mise en cache des membres sur **${server}**`)
-        .catch(console.error);
-    });
+    // // Caching all members on Bot init (->bug on reactions to messages with inactives users)
+    // server.members.fetch().then((members) => {
+    // console.log(members.size)
+    //     logsChannel.send(`⭕ **${members.size}** membres mis en cache.
+    //     \n✅ **FIN** de la mise en cache des membres sur **${server}**`)
+    //     .catch(console.error);
+    // });
 });
 
 client.on('message', async message => {
@@ -220,22 +239,24 @@ client.on('message', async message => {
 client.on('messageReactionAdd', (reaction, user) => {
     const message = reaction.message;
     const msgUser = message.guild.members.cache.get(user.id);
-    
-    //add crewmate role on desired reaction
-    if(reaction.emoji.name === 'crewmate' && !user.bot && message.channel.id === gameChannel.id && message.author.bot)
-    {
-        if(msgUser !== null) // && msgUser.roles.find(r => r.name === crewmateRole.name) === null) 
+    getMember(user.id).then(member => {
+        console.log(member.nickname);
+        //add crewmate role on desired reaction
+        if(reaction.emoji.name === 'crewmate' && !user.bot && message.channel.id === gameChannel.id && message.author.bot)
         {
-            msgUser.roles.add(crewmateRole);
-            console.log(`${msgUser} a rejoint le role ${crewmateRole.name}`);
-            logsChannel.send(`${msgUser} a rejoint le role ${crewmateRole.name}`);
-            message.edit(message.content + `\n* ${msgUser}`);
+            if(member !== null) // && msgUser.roles.find(r => r.name === crewmateRole.name) === null) 
+            {
+                member.roles.add(crewmateRole);
+                console.log(`${member} a rejoint le role ${crewmateRole.name}`);
+                logsChannel.send(`${member} a rejoint le role ${crewmateRole.name}`);
+                message.edit(message.content + `\n* ${member}`);
+            }
+            else {
+                console.log('Erreur lors de l\'ajout du rôle : membre inexistant ou kick (cache)');
+                return;
+            }
         }
-        else {
-            console.log('Erreur lors de l\'ajout du rôle : membre inexistant ou kick (cache)');
-            return;
-        }
-    }
+    });
 });
 
 //Removing roles on messageReactionRemove Event
