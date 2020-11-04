@@ -27,19 +27,22 @@ let crewChannel = undefined;
 let gameChannel = undefined;
 let fetchedMembers = [];
 
-const getMember = function(id) {
-    return new Promise(function(resolve, reject) {
-        const member = fetchedMembers.find(u => u.id === id);
-        if (member) {
-            resolve(member);
-        } else {
-            server.members.fetch().then((members) => {
+const getMember = (id) => {
+    return new Promise((resolve, reject) => {
+        try{
+            if (fetchedMembers.find(u => u.id === id) === undefined) {
+                server.members.fetch().then((members) => {
                 fetchedMembers = members;
                 resolve(fetchedMembers.find(u => u.id === id));
-            });
+            })};
+        } catch {
+            console.log('user not found : ' + id);
+            logsChannel.send('user not found : ' + id);
+            reject('user not found : ' + id);
         }
     });
   }
+
 //Initialize bot
 client.on('ready', () => {
     //// test d'insertion de valeurs en DB locale
@@ -52,9 +55,14 @@ client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
     console.log(server);
 
-    server.members.fetch().then((members) => {
-         fetchedMembers = members;
+    getMember('266293059526983691').then((member, err) => {
+        console.log(member,err);
     });
+
+
+    // server.members.fetch().then((members) => {
+    //      fetchedMembers = members;
+    // });
         
     crewmateRole = server.roles.cache.get(crewmateRoleId);
     console.log('crewmate role found :', crewmateRole)
