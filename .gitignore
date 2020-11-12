@@ -1,5 +1,5 @@
 
 config.json
-.vscode
+/.vscode
 db.json
-node_modules
+/node_modules
