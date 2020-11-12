@@ -6,7 +6,7 @@ const intents = new Intents([
 ]);
 
 const client = new Client({ ws: { intents } });
-const { prefix, token, serverId, pickupRoleId, crewmateRoleId, logsChannelId, crewChannelId, gameChannelId, generalChannelId, crewmateEmojiId, rnMemberId } = require('./config.json');
+const { prefix, token, serverId, pickupRoleId, crewmateRoleId, modoRoleId, logsChannelId, crewChannelId, gameChannelId, generalChannelId, crewmateEmojiId } = require('./config.json');
 
 // Not Used, just to try a DB
 // const low = require('lowdb');
@@ -23,6 +23,7 @@ const allowedLobbyTypes = ['all', 'chill', 'intermediate'];
 let server = undefined;
 let pickupRole = undefined;
 let crewmateRole = undefined;
+let modoRole = undefined;
 let logsChannel = undefined;
 let generalChannel = undefined;
 let crewChannel = undefined;
@@ -74,6 +75,9 @@ client.on('ready', () => {
     crewmateRole = server.roles.cache.get(crewmateRoleId);
     console.log('crewmate role found :', crewmateRole)
 
+    modoRole = server.roles.cache.get(modoRoleId);
+    console.log('modérateur role found :', modoRole)
+
     logsChannel = server.channels.cache.get(logsChannelId);
     console.log('logs channel found :', logsChannel)
 
@@ -104,7 +108,7 @@ client.on('message', async message => {
     else if (command === 'help' || command === 'h')
     {
         const msghelp = `Concernant la commande **!lobby** elle attend une (option) pour fonctionner à savoir un horaire \n\n` + 
-        `Par exemple : !lobby 22 créera un **lobby programmé pour 22h00 !**\n\n!lobby 22 30 créera un **lobby programmé pour 22h30 !**\n\n` +
+        `Par exemple :\n !lobby 22 créera un **lobby programmé pour 22h00 !**\n!lobby 22 30 créera un **lobby programmé pour 22h30 !**\n\n` +
         `Chaque personne voulant rejoindre votre lobby devra **réagir au message dans <#${gameChannelId}> avec l\'emote <:crewmate:${crewmateEmojiId}>** pour obtenir le rôle **<@&${crewmateRoleId}>**. \n\n` +
         `Les <@&${crewmateRoleId}> ont accès aux channels vocaux Lobby 1 & 2 ainsi qu\'au channel <#${crewChannelId}>, **sans ce rôle vous ne pourrez rejoindre le lobby !⚠️**` ;
         const helpEmbed = new Discord.MessageEmbed()
@@ -123,11 +127,11 @@ client.on('message', async message => {
             { name: '\u200B', value: '\u200B' }
         )
         .addField('⚠️Précisions pour la commande !lobby ⚠️\n\n', msghelp, true)
-        .addField('\u200B', '\u200B')
-        .setFooter('Plusieurs commandes seront ajoutées/modifées dans le futur, si vous avez besoin d\'aide mp moi !')
+        .addField('\u200B', `Si vous avez besoin d\'aide MP => <@&${modoRoleId}>`)
+        .setFooter(`Plusieurs commandes seront ajoutées/modifées dans le futur!`)
         .setTimestamp();
             
-            return message.channel.send(helpEmbed);
+        return message.channel.send(helpEmbed);
     }
     //Purge messages from channel, only for admins & mods
     else if (command === 'purge')
