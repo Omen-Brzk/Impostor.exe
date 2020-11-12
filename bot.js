@@ -116,18 +116,19 @@ client.on('message', async message => {
         .setTitle('Liste des commandes :')
         .setThumbnail('https://cdn.discordapp.com/attachments/395859711825805317/765613380891312208/unnamed.png')
         .addFields(
-            { name: '\u200B', value: '\u200B' },
             { name: '**!h** OU **!help**', value: 'Ouvre une fenêtre d\'aide avec les commandes disponibles.'},
-            { name: '\u200B', value: '\u200B' },
+            { name: '\u200B', value: '----' },
             { name: '**!imposteur**', value: 'Envoie un message tagant un membre souvent imposteur 🔪'},
-            { name: '\u200B', value: '\u200B' },
+            { name: '\u200B', value: '----' },
             { name: '**!i**', value: 'Vous envoie un message avec l\'invitation **unique** du serveur Discord.'},
-            { name: '\u200B', value: '\u200B' },
+            { name: '\u200B', value: '----' },
             { name: '**!lobby (option)**', value: `Crée un message dans <#${gameChannelId}> cliquable pour organiser et rejoindre un lobby.`},
-            { name: '\u200B', value: '\u200B' }
+            { name: '\u200B', value: '----' },
+            { name: '**!pickup**', value: `Vous donnera le rôle ${pickupRole}, celui-ci vous permettra d'être notifié lorsqu'une place se libère.`},
+            { name: '\u200B', value: '----' }
         )
         .addField('⚠️Précisions pour la commande !lobby ⚠️\n\n', msghelp, true)
-        .addField('\u200B', `Si vous avez besoin d\'aide MP => <@&${modoRoleId}>`)
+        .addField('\u200B', `---- \nSi vous avez besoin d\'aide MP => <@&${modoRoleId}>`)
         .setFooter(`Plusieurs commandes seront ajoutées/modifées dans le futur!`)
         .setTimestamp();
             
