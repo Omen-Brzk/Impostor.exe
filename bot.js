@@ -110,7 +110,7 @@ client.on('message', async message => {
         const msghelp = `Concernant la commande **!lobby** elle attend une (option) pour fonctionner à savoir un horaire \n\n` + 
         `Par exemple :\n !lobby 22 créera un **lobby programmé pour 22h00 !**\n!lobby 22 30 créera un **lobby programmé pour 22h30 !**\n\n` +
         `Chaque personne voulant rejoindre votre lobby devra **réagir au message dans <#${gameChannelId}> avec l\'emote <:crewmate:${crewmateEmojiId}>** pour obtenir le rôle **<@&${crewmateRoleId}>**. \n\n` +
-        `Les <@&${crewmateRoleId}> ont accès aux channels vocaux Lobby 1 & 2 ainsi qu\'au channel <#${crewChannelId}>, **sans ce rôle vous ne pourrez rejoindre le lobby !⚠️**` ;
+        `Les <@&${crewmateRoleId}> ont accès aux channels vocaux Lobby 1 & 2 ainsi qu\'au channel <#${crewChannelId}> :\n⚠️**sans ce rôle vous ne pourrez rejoindre le lobby !⚠️**` ;
         const helpEmbed = new Discord.MessageEmbed()
         .setColor('#0099ff')
         .setTitle('Liste des commandes :')
