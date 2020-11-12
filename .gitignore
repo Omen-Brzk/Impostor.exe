@@ -1,3 +1,5 @@
 
 config.json
+.vscode
+db.json
 node_modules
