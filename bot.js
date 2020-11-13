@@ -245,7 +245,7 @@ client.on('message', async message => {
     }
     else if(command === 'pickup') {
         if(!message.member.bot && gameChannel.messages.cache.size > 0 && message.channel.id === generalChannelId) {
-            message.member.roles.add(crewmateRole);
+            message.member.roles.add(pickupRole);
             console.log(`${message.member} a rejoint le role ${pickupRole.name}`);
             logsChannel.send(`${message.member} a rejoint le role ${pickupRole}`);
         } else {
