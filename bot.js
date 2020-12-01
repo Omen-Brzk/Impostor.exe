@@ -6,7 +6,7 @@ const intents = new Intents([
 ]);
 
 const client = new Client({ ws: { intents } });
-const { prefix, token, serverId, pickupRoleId, crewmateRoleId, modoRoleId, logsChannelId, crewChannelId, gameChannelId, generalChannelId, crewmateEmojiId } = require('./config.json');
+const { prefix, token, serverId, pickupRoleId, crewmateRoleId, modoRoleId, logsChannelId, crewChannelId, gameChannelId, botChannelId, generalChannelId, crewmateEmojiId } = require('./config.json');
 
 // Not Used, just to try a DB
 // const low = require('lowdb');
@@ -122,9 +122,9 @@ client.on('message', async message => {
             { name: '\u200B', value: '----' },
             { name: '**!i**', value: 'Vous envoie un message avec l\'invitation **unique** du serveur Discord.'},
             { name: '\u200B', value: '----' },
-            { name: '**!lobby (option)**', value: `Crée un message dans <#${gameChannelId}> cliquable pour organiser et rejoindre un lobby.`},
+            { name: '**!pickup**', value: `Vous donnera le rôle ${pickupRole}, celui-ci vous permettra d'être notifié lorsqu'une place se libère. Uniquement disponible lorsqu'une (ou plusieures) game(s) est/sont crée(s).`},
             { name: '\u200B', value: '----' },
-            { name: '**!pickup**', value: `Vous donnera le rôle ${pickupRole}, celui-ci vous permettra d'être notifié lorsqu'une place se libère.`},
+            { name: '**!lobby (option)**', value: `Crée un message dans <#${gameChannelId}> cliquable pour organiser et rejoindre un lobby.`},
             { name: '\u200B', value: '----' }
         )
         .addField('⚠️Précisions pour la commande !lobby ⚠️\n\n', msghelp, true)
@@ -244,7 +244,7 @@ client.on('message', async message => {
         console.log(h);
     }
     else if(command === 'pickup') {
-        if(!message.member.bot && gameChannel.messages.cache.size > 0 && message.channel.id === generalChannelId) {
+        if(!message.member.bot && gameChannel.messages.cache.size > 0 && (message.channel.id === generalChannelId || message.channel.id === botChannelId)) {
             message.member.roles.add(pickupRole);
             console.log(`${message.member} a rejoint le role ${pickupRole.name}`);
             logsChannel.send(`${message.member} a rejoint le role ${pickupRole}`);
