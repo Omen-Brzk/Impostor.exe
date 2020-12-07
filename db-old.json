@@ -1,0 +1,43 @@
+{
+  "users": [
+    {
+      "name": "bla",
+      "role": "player"
+    },
+    {
+      "name": "blablabla",
+      "role": "player"
+    },
+    {
+      "name": "blabla",
+      "role": "player"
+    },
+    {
+      "name": "blablablabla",
+      "role": "player"
+    },
+    {
+      "name": "pushed",
+      "role": "quedal"
+    }
+  ],
+  "other": [
+    "users",
+    "sdf"
+  ],
+  "tournaments": [
+    {
+      "hash": "tomnsruwomxnaefsawnfvkiy",
+      "date": "2020-12-07T22:33:25.790Z",
+      "players": [
+        "test",
+        "test2"
+      ]
+    },
+    {
+      "hash": "test",
+      "date": "2020-12-07T22:33:25.792Z",
+      "players": []
+    }
+  ]
+}

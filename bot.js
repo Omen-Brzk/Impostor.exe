@@ -60,8 +60,8 @@ const getMember = (id) => {
 //Initialize bot
 client.on('ready', () => {
     db.test();
-    db.createTournament();
-    db.addUserToTournament('toto');
+    // db.createTournament(new Date());
+    // db.addUserToTournament('test', 'toto');
 
     server = client.guilds.cache.get(serverId);
     console.log(`Logged in as ${client.user.tag}!`);
@@ -233,7 +233,9 @@ client.on('message', async message => {
 
         /// Oniii's hack
         if(!crewmateEmoji) {
-            console.log(client.emojis);
+            crewmateEmoji = '✅';
+            console.log(crewmateEmoji);
+
             crewmateEmoji = client.emojis.cache.find(e => e.name === 'muscle');
             console.log('emoji fallback : ', crewmateEmoji);
 
