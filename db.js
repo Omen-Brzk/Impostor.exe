@@ -21,7 +21,7 @@ module.exports = {
 
         users.remove(x => x.name === '15').write();
         console.log(users.value());
-        users.push({name:'pushed', role: 'quedal'}).write().then(_ => console.log(users.value()));
+        users.push({name:'pushed', role: 'quedal'}).write();
         console.log(users.value());
     },
     

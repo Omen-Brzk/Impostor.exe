@@ -110,7 +110,7 @@ client.on('message', async message => {
 
         let invite = await message.channel.createInvite(
             {
-              maxAge: 24 * 60 * 1000, // 24h
+              maxAge: 24 * 60 * 60, // 24h
               maxUses: 1 // maximum times it can be used
             },
             `Requested with command by ${message.author.tag}`
