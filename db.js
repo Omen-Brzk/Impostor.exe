@@ -25,33 +25,71 @@ module.exports = {
         console.log(users.value());
     },
     
-    createTournament: function(date) {
-        const tournamentId = 'test';//this.genHash();
+    createTournament: function(hash, date) {
+        const tournamentId = 'test';
         console.log('tournament creating', tournamentId);
-        // if(!db.get('tournaments'))
-        db.set('tournaments', [{hash: this.genHash(), date: date, players: ['test', 'test2']}]).write();
         
-        const tournaments = db.get('tournaments');
-        tournaments.push({hash: tournamentId, date: new Date(), players: []}).write();
+        let tournaments = db.get('tournaments');
+        if(tournaments.value() === undefined) {
+            db.set('tournaments', []).write();
+            tournaments = db.get('tournaments');
+        }
+
+        console.log(tournaments.value());
+        if(this.tournamentExists(tournamentId)) return;
+        
+        tournaments.push({id: tournamentId, date: date, players: ['test', 'test2']}).write();
         console.log(tournaments.value());
     },
-    
-    addUserToTournament: function(tournamentHash, userId) {
-        // const tournament = db.get('tournaments.hash', tournament);
-        const tournaments = db.get('tournaments');
-        const tournament = tournaments.find(t => t.hash === tournamentHash);
-        console.log(tournament.value());
-        tournament.players?.push(userId).write();
-        console.log(tournament.value());
+
+    listTournaments: function(){
+        return db.get('tournaments');
     },
     
-    genHash: function() {
-        const chars = 'abcdefghijklmnopqrstuvwxyz';
-        let h = "";
-        let n = 24;
-        for(let i = 0; i < n; i++) {
-            h += chars[Math.floor(Math.random() * chars.length)];
+    addUserToTournament: function(tournamentId, userId) {
+        const tournaments = db.get('tournaments');
+        const tournament = tournaments.find({id: tournamentId});
+        const players = tournament.get('players');
+        if(players.find(p => p === userId).value() !== undefined) {
+            console.log('user already registered')
+            return;
+        } else {
+            players.push(userId).write();
+            console.log(players.value());
         }
-        return h;
+    },
+
+    removeUserFromTournament: function(tournamentId, userId) {
+        const tournaments = db.get('tournaments');
+        const tournament = tournaments.find({id: tournamentId});
+        const players = tournament.get('players');
+        if(players.find(p => p === userId).value() === undefined) {
+            console.log('user not registered')
+            return;
+        } else {
+            players.remove(p => p === userId).write();
+            console.log(players.value());
+        }
+    },
+
+    removeTournament: function(hash) {
+        const tournamentId = 'test';
+        console.log('tournament creating', tournamentId);
+        
+        let tournaments = db.get('tournaments');
+        if(tournaments.value() === undefined) {
+            db.set('tournaments', []).write();
+            tournaments = db.get('tournaments');
+        }
+
+        console.log(tournaments.value());
+        tournaments.push({tournamentId, date: date, players: ['test', 'test2']}).write();
+        console.log(tournaments.value());
+    },
+
+    tournamentExists: function(tournamentId) {
+        const tournaments = db.get('tournaments');
+        const tournament = tournaments.find({id: tournamentId});
+        return tournament.value() !== undefined;
     }
 }

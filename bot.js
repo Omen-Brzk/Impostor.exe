@@ -15,6 +15,7 @@ const { prefix,
         crewmateRoleId,
         modoRoleId,
         logsChannelId,
+        infoChannelId,
         crewChannelId,
         gameChannelId,
         botChannelId,
@@ -34,6 +35,7 @@ let pickupRole = undefined;
 let crewmateRole = undefined;
 let modoRole = undefined;
 let logsChannel = undefined;
+let infoChannel = undefined;
 let generalChannel = undefined;
 let crewChannel = undefined;
 let gameChannel = undefined;
@@ -60,40 +62,47 @@ const getMember = (id) => {
 //Initialize bot
 client.on('ready', () => {
     db.test();
-    // db.createTournament(new Date());
+    db.createTournament(genHash(), new Date());
     // db.addUserToTournament('test', 'toto');
+    // db.addUserToTournament('test', 'toto3');
+    // db.removeUserFromTournament('test', 'toto2');
+    // db.removeUserFromTournament('test', 'toto');
+    // db.removeUserFromTournament('test', 'toto3');
 
     server = client.guilds.cache.get(serverId);
     console.log(`Logged in as ${client.user.tag}!`);
-    console.log(server);
+    // console.log(server);
 
     // Caching all members on Bot init (->bug on reactions to messages with inactives users)
-    server.members.fetch().then((members) => {
-        fetchedMembers = members;
-        console.log(fetchedMembers.size + ' members found');
-        //logsChannel.send(`⭕ **${members.size}** membres mis en cache.\n✅ **FIN** de la mise en cache des membres sur **${server}**`)
-    });
+    // server.members.fetch().then((members) => {
+    //     fetchedMembers = members;
+    //     console.log(fetchedMembers.size + ' members found');
+    //     //logsChannel.send(`⭕ **${members.size}** membres mis en cache.\n✅ **FIN** de la mise en cache des membres sur **${server}**`)
+    // });
     
-    pickupRole = server.roles.cache.get(pickupRoleId);
-    console.log('pickup role found :', pickupRole)
+    // pickupRole = server.roles.cache.get(pickupRoleId);
+    // console.log('pickup role found :', pickupRole)
 
-    crewmateRole = server.roles.cache.get(crewmateRoleId);
-    console.log('crewmate role found :', crewmateRole)
+    // crewmateRole = server.roles.cache.get(crewmateRoleId);
+    // console.log('crewmate role found :', crewmateRole)
 
-    modoRole = server.roles.cache.get(modoRoleId);
-    console.log('modérateur role found :', modoRole)
+    // modoRole = server.roles.cache.get(modoRoleId);
+    // console.log('modérateur role found :', modoRole)
 
-    logsChannel = server.channels.cache.get(logsChannelId);
-    console.log('logs channel found :', logsChannel)
+    // logsChannel = server.channels.cache.get(logsChannelId);
+    // console.log('logs channel found :', logsChannel)
 
-    generalChannel = server.channels.cache.get(generalChannelId);
-    console.log('general channel found :', generalChannel)
+    // infoChannel = server.channels.cache.get(infoChannelId);
+    // console.log('info channel found :', infoChannel)
 
-    crewChannel = server.channels.cache.get(crewChannelId);
-    console.log('crew channel found :', crewChannel)
+    // generalChannel = server.channels.cache.get(generalChannelId);
+    // console.log('general channel found :', generalChannel)
+
+    // crewChannel = server.channels.cache.get(crewChannelId);
+    // console.log('crew channel found :', crewChannel)
     
-    gameChannel = server.channels.cache.get(gameChannelId);
-    console.log('game channel found :', crewmateRole);
+    // gameChannel = server.channels.cache.get(gameChannelId);
+    // console.log('game channel found :', crewmateRole);
 });
 
 client.on('message', async message => {
@@ -101,10 +110,51 @@ client.on('message', async message => {
     
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
-    const validCommands = ['lobby', 'gameover', 'purge', 'help', 'i'];
+    const validCommands = ['test', 'i', 'invite', 'h', 'help', 'purge', 'gameover', 'lobby', 'pickup'];
     
     //Discord invite command
-    if (command === 'i' || command === 'invite')
+    if(validCommands.indexOf(command) < 0 || !command) {
+        message.channel.send(`${message.author}, commande invalide ou inexistante ! => <#${infoChannelId}> pour une assistance.`);
+        return;
+    }
+    else if (command === 'test')
+    {
+        if(!message.member.roles.cache.has(modoRoleId)) return;
+
+        const action = args[0];
+        const hash = args[1];
+        const userId = args[2];
+
+        if(!db.tournamentExists(hash))
+        {
+            console.log('tournament not found');
+            const tournaments = db.listTournaments();
+            const ids = tournaments.value().map(t => t.id);
+            let listIds = '';
+            ids.forEach(element => {
+                listIds += element + '|';
+            });
+            message.channel.send('tournaments : ' + listIds);
+            return;
+        }
+
+        const userToAdd = getUserFromArgs(userId.substr(3,18));
+        if(!userToAdd) {
+            message.channel.send('User' + userId + ' Not Found : ');
+            return;
+        }
+
+        // TODO : add to tournament
+        console.log('TODO');
+        if(action === 'add') {
+            db.addUserToTournament(hash, userToAdd.nickname);
+        }
+
+        if(action === 'remove') {
+            db.removeUserFromTournament(hash, userToAdd.nickname);
+        }
+    }
+    else if (command === 'i' || command === 'invite')
     {
         //message.channel.send(`${message.author}, https://discord.gg/SKKsRNu`);
 
@@ -312,10 +362,6 @@ client.on('message', async message => {
             }
         }
         return;
-    }
-    else if(command !== validCommands || !command) {
-        message.channel.send(`${message.author}, commande invalide ou inexistante ! \n Tapez !help pour une assistance.`);
-        return;
     };
 });
 
@@ -391,3 +437,25 @@ client.on('guildMemberRemove', (member) =>{
 
 //Bot login, code must be above this line.
 client.login(token);
+
+function genHash() {
+    const chars = 'abcdefghijklmnopqrstuvwxyz';
+    let h = "";
+    let n = 24;
+    for(let i = 0; i < n; i++) {
+        h += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return h;
+};
+
+function getUserFromArgs(userArg) {
+    const userId = userArg.substr(3,18);
+    const user = server.members.cache.get('266293059526983691');
+    if(user) {
+        console.log('user found : ', user.nickname);
+        return user;
+    }
+
+    console.log('user ' + arg + ' not found')
+    return undefined;
+};
