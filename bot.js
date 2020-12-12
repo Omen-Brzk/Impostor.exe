@@ -28,7 +28,7 @@ const { prefix,
 const moment = require('moment');
 const allowedTimeFormats = ['HH:mm'];
 
-const allowedLobbyTypes = ['chill', 'intermediate'];
+const allowedLobbyTypes = ['chill', 'tryhard'];
 
 let server = undefined;
 let pickupRole = undefined;
@@ -169,11 +169,13 @@ client.on('message', async message => {
     //help command
     else if (command === 'help' || command === 'h')
     {
-        const helpLobby = `- **horaire** (obligatoire)\n` + 
-        `Formats acceptés : HH (ex: 21) | HH:mm (ex: 21:30) | HHhmm (ex: 21h30)\n\n` + 
+        const helpLobby = 
+        `- **horaire** (obligatoire)\n` + 
+        `  formats acceptés : HH (ex: 21) | HH:mm (ex: 21:30) | HHhmm (ex: 21h30)\n\n` + 
         `- **mode** (non-obligatoire, si non précisé => chill)\n` + 
-        `Les modes acceptés sont : chill | intermediate\n` + 
-        `Le mode définit le niveau de la partie, merci de le respecter\n\n` + 
+        `  Le mode définit le niveau de la partie, les modes acceptés sont : chill | tryhard, merci de le respecter :\n` + 
+        `    chill: pas de task-abuse, on joue tranquille, y'a pas de règles\n` + 
+        `    tryhard: on parle conçit, on se base que sur des infos, task-abuse ok (sauf scanner)  \n\n` + 
         `⚠️Chaque personne voulant rejoindre votre lobby devra **réagir au message dans <#${gameChannelId}> avec l\'emote <:crewmate:${crewmateEmojiId}>** pour obtenir le rôle **<@&${crewmateRoleId}>** (sans ce rôle vous ne pourrez rejoindre de lobby !) ⚠️` ;
 
         const helpPickup = `vous pouvez ajouter 'r' OU 'remove', cela vous retirera le rôle ${pickupRole}`;
