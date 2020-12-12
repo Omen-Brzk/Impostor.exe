@@ -2,4 +2,5 @@
 config.json
 /.vscode
 db.json
+db-old.json
 /node_modules
