@@ -61,48 +61,40 @@ const getMember = (id) => {
 
 //Initialize bot
 client.on('ready', () => {
-    db.test();
-    db.createTournament(genHash(), new Date());
-    // db.addUserToTournament('test', 'toto');
-    // db.addUserToTournament('test', 'toto3');
-    // db.removeUserFromTournament('test', 'toto2');
-    // db.removeUserFromTournament('test', 'toto');
-    // db.removeUserFromTournament('test', 'toto3');
-
     server = client.guilds.cache.get(serverId);
     console.log(`Logged in as ${client.user.tag}!`);
-    // console.log(server);
+    console.log(server);
 
     // Caching all members on Bot init (->bug on reactions to messages with inactives users)
-    // server.members.fetch().then((members) => {
-    //     fetchedMembers = members;
-    //     console.log(fetchedMembers.size + ' members found');
-    //     //logsChannel.send(`⭕ **${members.size}** membres mis en cache.\n✅ **FIN** de la mise en cache des membres sur **${server}**`)
-    // });
+    server.members.fetch().then((members) => {
+        fetchedMembers = members;
+        console.log(fetchedMembers.size + ' members found');
+        //logsChannel.send(`⭕ **${members.size}** membres mis en cache.\n✅ **FIN** de la mise en cache des membres sur **${server}**`)
+    });
     
-    // pickupRole = server.roles.cache.get(pickupRoleId);
-    // console.log('pickup role found :', pickupRole)
+    pickupRole = server.roles.cache.get(pickupRoleId);
+    console.log('pickup role found :', pickupRole)
 
-    // crewmateRole = server.roles.cache.get(crewmateRoleId);
-    // console.log('crewmate role found :', crewmateRole)
+    crewmateRole = server.roles.cache.get(crewmateRoleId);
+    console.log('crewmate role found :', crewmateRole)
 
-    // modoRole = server.roles.cache.get(modoRoleId);
-    // console.log('modérateur role found :', modoRole)
+    modoRole = server.roles.cache.get(modoRoleId);
+    console.log('modérateur role found :', modoRole)
 
-    // logsChannel = server.channels.cache.get(logsChannelId);
-    // console.log('logs channel found :', logsChannel)
+    logsChannel = server.channels.cache.get(logsChannelId);
+    console.log('logs channel found :', logsChannel)
 
-    // infoChannel = server.channels.cache.get(infoChannelId);
-    // console.log('info channel found :', infoChannel)
+    infoChannel = server.channels.cache.get(infoChannelId);
+    console.log('info channel found :', infoChannel)
 
-    // generalChannel = server.channels.cache.get(generalChannelId);
-    // console.log('general channel found :', generalChannel)
+    generalChannel = server.channels.cache.get(generalChannelId);
+    console.log('general channel found :', generalChannel)
 
-    // crewChannel = server.channels.cache.get(crewChannelId);
-    // console.log('crew channel found :', crewChannel)
+    crewChannel = server.channels.cache.get(crewChannelId);
+    console.log('crew channel found :', crewChannel)
     
-    // gameChannel = server.channels.cache.get(gameChannelId);
-    // console.log('game channel found :', crewmateRole);
+    gameChannel = server.channels.cache.get(gameChannelId);
+    console.log('game channel found :', crewmateRole);
 });
 
 client.on('message', async message => {
@@ -124,6 +116,10 @@ client.on('message', async message => {
         const action = args[0];
         const hash = args[1];
         const userId = args[2];
+
+        if(action === 'create') {
+            db.createTournament(hash, new Date());
+        }
 
         if(!db.tournamentExists(hash))
         {
