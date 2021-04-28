@@ -1,13 +1,11 @@
 {
     "name": "impostor.exe",
-    "version": "0.1.4b",
-    "description": "custom bot to create among us games with friends",
+    "version": "0.1.5",
+    "description": "custom js discord bot to create among us games with friends",
     "main": "bot.js",
     "author": "RN",
     "dependencies": {
         "discord.js": "^12.3.1",
-        "litedb": "0.0.1",
-        "lowdb": "^1.0.0",
         "moment": "^2.29.1"
     }
 }
