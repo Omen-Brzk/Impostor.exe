@@ -24,7 +24,7 @@ module.exports = {
         commandUser.roles.add(crewmateRole);
         logsChannel.send(`${message.author} a ouvert un lobby,\n||(#**${h}**)||`);
         
-        gameChannel.send(`||test||\n\n📢  ${message.author} organise une game **Among Us** aujourd'hui à **${time.format('HH:mm')}** !
+        gameChannel.send(`||@here||\n\n📢  ${message.author} organise une game **Among Us** aujourd'hui à **${time.format('HH:mm')}** !
         \n\n ➡️  Pour participer : Merci de **réagir à ce message avec l'émote :  <:crewmate:${crewmateEmojiId}>  (sans quoi votre participation ne comptera pas) !!!**
         \n\n 🔷 Réagir avec cette emote vous donnera l'accès au rôle **${crewmateRole}** ainsi qu'au channel <#${crewChannel.id}> pour préparer votre game ! 
         \n\n 🔵 Vous aurez également accès au channels vocaux **Lobby 1 & 2 !**
